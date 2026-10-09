@@ -17,7 +17,7 @@
   "scripts": {
     "test": "jest",
     "start-node-dev": "node --watch be-nodejs/src/index.js",
-    "start-express-dev": "node --watch be-express/src/app.js"
+    "start-express-dev": "tsc && node --watch be-express/src/app.js"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
@@ -29,6 +29,7 @@
     "dotenv": "^18.0.4",
     "express": "^5.2.1",
     "nodemailer": "^10.0.13",
-    "pg": "^8.23.0"
+    "pg": "^8.23.0",
+    "typeorm": "^1.1.2"
   }
 }

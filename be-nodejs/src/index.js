@@ -36,7 +36,7 @@ const dbPool = new Pool({
     database: PG_DB
 });
 
-async function getBodyAsObject(req) {
+async function getBodyAsObject (req) {
     let body = [];
     return new Promise((resolve, reject) => {
         req.on('data', (chunk) => {
@@ -44,9 +44,11 @@ async function getBodyAsObject(req) {
         });
         req.on('end', () => {
             body = Buffer.concat(body).toString();
-            try {
+            try
+            {
                 resolve(JSON.parse(body));
-            } catch (e) {
+            } catch (e)
+            {
                 reject(e);
             }
         });
@@ -74,8 +76,10 @@ const serverApp = createServer(async (req, res) => {
 
     // endpoints
     // FR-03: create task
-    if (reqUrl == '/api/v1/todos' && httpMethod == 'POST') {
-        if (!req.headers.authorization) {
+    if (reqUrl == '/api/v1/todos' && httpMethod == 'POST')
+    {
+        if (!req.headers.authorization)
+        {
             console.log('No authorization header');
             res.writeHead(401, responseHead);
             res.end(JSON.stringify({
@@ -83,7 +87,8 @@ const serverApp = createServer(async (req, res) => {
             }));
             return;
         }
-        else {
+        else
+        {
             res.writeHead(201, responseHead);
             // check body
             const body = await getBodyAsObject(req);
@@ -94,17 +99,19 @@ const serverApp = createServer(async (req, res) => {
             }));
         }
     }
-    else if (reqUrl == '/api/v1/auth/register' && httpMethod == 'POST') {
+    else if (reqUrl == '/api/v1/auth/register' && httpMethod == 'POST')
+    {
         // check email attached with email
         const reqBody = await getBodyAsObject(req);
         const email = reqBody.email;
         const queryGetUserResult = await dbPool.query({
             name: 'fetch-user',
             text: 'SELECT * FROM users WHERE email=$1',
-            values: [email]
+            values: [ email ]
         });
         const isEmailFound = queryGetUserResult.rows.length;
-        if (isEmailFound) {
+        if (isEmailFound)
+        {
             res.writeHead(400, responseHead);
             res.end(JSON.stringify({
                 'errorMessage': 'Email is used for another account'
@@ -120,7 +127,7 @@ const serverApp = createServer(async (req, res) => {
             const queryInsertUserResult = await dbPool.query({
                 name: 'insert-user',
                 text: 'INSERT INTO users(email, password_hash, is_verified) VALUES ($1,$2,$3);',
-                values: [email, hash, true]
+                values: [ email, hash, true ]
             });
         });
 
@@ -129,26 +136,29 @@ const serverApp = createServer(async (req, res) => {
             message: 'Account created, waiting for email verification'
         }));
     }
-    else if (reqUrl == '/api/v1/todos' && httpMethod == 'POST') {
+    else if (reqUrl == '/api/v1/todos' && httpMethod == 'POST')
+    {
         // authentication
 
         // create task
         const reqBody = getBodyAsObject(req);
-        if (!('title' in reqBody)) {
+        if (!('title' in reqBody))
+        {
             res.writeHead(200);
         }
     }
 });
 
 const PORT = 3000;
-async function startServer() {
-    try {
+async function startServer () {
+    try
+    {
         console.log(await dbPool.query('SELECT NOW()'));
 
         // init db
         await dbPool.query(`
         CREATE TABLE IF NOT EXISTS users (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             email VARCHAR(50) UNIQUE NOT NULL,
             password_hash CHAR(60) NOT NULL,
             is_verified BOOLEAN NOT NULL,
@@ -156,8 +166,8 @@ async function startServer() {
         )`);
         await dbPool.query(`
         CREATE TABLE IF NOT EXISTS todos (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            user_id UUID REFERENCES users(id),
+            todo_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            user_id UUID REFERENCES users(user_id),
             title VARCHAR(200) NOT NULL,
             description VARCHAR(2000),
             status VARCHAR(11) CHECK (status IN ('TODO', 'IN-PROGRESS', 'DONE')),
@@ -166,13 +176,16 @@ async function startServer() {
             created_at TIMESTAMPTZ DEFAULT now(),
             updated_at TIMESTAMPTZ DEFAULT now()
         )`);
-    } catch (e) {
+    } catch (e)
+    {
         console.error(e);
     }
-    try {
+    try
+    {
         await transporter.verify();
         console.log('Server is ready to send mails');
-    } catch (e) {
+    } catch (e)
+    {
         console.error(e);
 
     }
