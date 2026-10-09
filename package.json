@@ -16,9 +16,11 @@
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
-    "start-node-dev": "node --watch be-nodejs/src/index.js"
+    "start-node-dev": "node --watch be-nodejs/src/index.js",
+    "start-express-dev": "node --watch be-express/src/app.js"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "jest": "^30.5.2"
   },
